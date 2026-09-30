@@ -22,6 +22,7 @@ require 'bindata/trace'
 require 'bindata/uint8_array'
 require 'bindata/virtual'
 require 'bindata/alignment'
+require 'bindata/arith'
 require 'bindata/warnings'
 
 # = BinData

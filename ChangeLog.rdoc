@@ -1,5 +1,12 @@
 = BinData Changelog
 
+== Unreleased
+
+* Added the +arith+ field (BinData::Arith), which stores a sequence of
+  small integer symbols as an arithmetic coded bit stream with
+  caller supplied cumulative frequency models.  See
+  BinData::ArithmeticCodec for the coding rules.
+
 == Version 3.0.1 (2026-09-27)
 
 * Fixed regression with anon classes. Thanks to Babar Al-Amin.
