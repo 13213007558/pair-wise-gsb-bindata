@@ -2,6 +2,7 @@
 # Copyright (c) 2007 - 2026 Dion Mendel.
 
 require 'bindata/version'
+require 'bindata/arithmetic'
 require 'bindata/array'
 require 'bindata/bits'
 require 'bindata/buffer'

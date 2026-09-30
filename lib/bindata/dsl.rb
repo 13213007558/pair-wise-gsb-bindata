@@ -146,6 +146,7 @@ module BinData
         @abilities ||= {
           struct:     [:to_struct_params, :struct,      [:multiple_fields, :optional_fieldnames, :hidden_fields]],
           array:      [:to_object_params, :type,        [:multiple_fields, :optional_fieldnames]],
+          arithmetic: [:to_object_params, :type,        [:multiple_fields, :optional_fieldnames, :hidden_fields]],
           buffer:     [:to_object_params, :type,        [:multiple_fields, :optional_fieldnames, :hidden_fields]],
           choice:     [:to_choice_params, :choices,     [:multiple_fields, :all_or_none_fieldnames, :fieldnames_are_values]],
           delayed_io: [:to_object_params, :type,        [:multiple_fields, :optional_fieldnames, :hidden_fields]],
@@ -400,6 +401,7 @@ module BinData
       def params_from_block(&block)
         bindata_classes = {
           array:      BinData::Array,
+          arithmetic: BinData::Arithmetic,
           buffer:     BinData::Buffer,
           choice:     BinData::Choice,
           delayed_io: BinData::DelayedIO,
