@@ -55,6 +55,11 @@ module BinData
   #                        calls to #read, #write, #num_bytes or #snapshot.
   # [<tt>:byte_align</tt>] This field's rel_offset must be a multiple of
   #                        <tt>:byte_align</tt>.
+  # [<tt>:solved_length</tt>]
+  #                        This field's value is solved so that it equals
+  #                        the total number of bytes of this struct,
+  #                        including the bytes of this field itself.  See
+  #                        BinData::LayoutSolver.
   class Struct < BinData::Base
     arg_processor :struct
 
@@ -74,6 +79,7 @@ module BinData
          %w[type initial_length read_until] +
          %w[fields endian search_namespace search_prefix hide onlyif byte_align] +
          %w[choices selection copy_on_change] +
+         %w[solved_length] +
          %w[read_abs_offset struct_params])
         .collect(&:to_sym)
         .uniq.collect { |key| [key, true] }
@@ -84,6 +90,7 @@ module BinData
       fields = get_parameter(:fields)
       @field_names = fields.field_names.freeze
       extend ByteAlignPlugin if fields.any_field_has_parameter?(:byte_align)
+      extend SolvedLengthPlugin if fields.any_field_has_parameter?(:solved_length)
       define_field_accessors
       super
     end

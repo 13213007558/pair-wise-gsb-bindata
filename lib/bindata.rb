@@ -23,6 +23,9 @@ require 'bindata/uint8_array'
 require 'bindata/virtual'
 require 'bindata/alignment'
 require 'bindata/warnings'
+require 'bindata/layout_solver'
+require 'bindata/varint'
+require 'bindata/solved_length'
 
 # = BinData
 # 

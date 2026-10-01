@@ -1,5 +1,13 @@
 = BinData Changelog
 
+== Unreleased
+
+* Added BinData::Varint - unsigned LEB128 variable length integers.
+* Added BinData::LayoutSolver - constrained solver for self referential
+  record layouts (lengths, offsets and alignment).
+* Added :solved_length field parameter for self describing records whose
+  length prefix includes the bytes of the length field itself.
+
 == Version 3.0.1 (2026-09-27)
 
 * Fixed regression with anon classes. Thanks to Babar Al-Amin.
