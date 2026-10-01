@@ -1,5 +1,14 @@
 = BinData Changelog
 
+== Unreleased
+
+* Added BinData::Layout, a constrained solver for non negative monotonic
+  layout expressions (lengths, field offsets, alignment).
+* Added BinData::Varint, an unsigned variable length integer primitive.
+* Added BinData::SelfSizedRecord, a record whose leading varint length
+  counts its own encoded width and any alignment padding.  Writes are
+  atomic: a failed build never leaves a partial record on the caller's IO.
+
 == Version 3.0.1 (2026-09-27)
 
 * Fixed regression with anon classes. Thanks to Babar Al-Amin.
