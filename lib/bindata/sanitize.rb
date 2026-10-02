@@ -21,11 +21,15 @@ module BinData
 
       if BinData::Base === obj_class
         @factory = obj_class
+        @object_class = obj_class
       else
         @obj_class  = obj_class
         @obj_params = SanitizedParameters.new(obj_params, @obj_class, namespace, hints)
+        @object_class = obj_class
       end
     end
+
+    attr_reader :object_class
 
     def has_parameter?(param)
       if defined? @factory

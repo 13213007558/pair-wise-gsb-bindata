@@ -217,7 +217,28 @@ module BinData
     # Returns the offset (in bytes) of this object with respect to its most
     # distant ancestor.
     def abs_offset
+      return @layout_abs_offset if defined?(@layout_abs_offset)
       @parent ? @parent.abs_offset + @parent.offset_of(self) : 0
+    end
+
+    def layout_abs_offset=(offset)
+      @layout_abs_offset = offset
+    end
+
+    def reset_layout_abs_offset!
+      remove_instance_variable(:@layout_abs_offset) if defined?(@layout_abs_offset)
+    end
+
+    def layout_context
+      @layout_context || @parent&.layout_context
+    end
+
+    def layout_context=(context)
+      @layout_context = context
+    end
+
+    def layout_regular_children
+      []
     end
 
     # Returns the offset (in bytes) of this object with respect to its parent.

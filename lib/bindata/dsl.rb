@@ -61,6 +61,7 @@ module BinData
     #
     class DSLParser
       def initialize(the_class, parser_type)
+        parser_type = :delayed_io if the_class.respond_to?(:pointer_dsl_parser?)
         raise "unknown parser type #{parser_type}" unless parser_abilities[parser_type]
 
         @the_class      = the_class
@@ -150,6 +151,7 @@ module BinData
           choice:     [:to_choice_params, :choices,     [:multiple_fields, :all_or_none_fieldnames, :fieldnames_are_values]],
           delayed_io: [:to_object_params, :type,        [:multiple_fields, :optional_fieldnames, :hidden_fields]],
           primitive:  [:to_struct_params, :struct,      [:multiple_fields, :optional_fieldnames]],
+          pointer:    [:to_pointer_params,              [:multiple_fields, :optional_fieldnames]],
           section:    [:to_object_params, :type,        [:multiple_fields, :optional_fieldnames]],
           skip:       [:to_object_params, :until_valid, [:multiple_fields, :optional_fieldnames]]
         }
@@ -251,6 +253,17 @@ module BinData
           choices = {}
           fields.each { |f| choices[f.name] = f.prototype }
           { key => choices }
+        end
+      end
+
+      def to_pointer_params(*_)
+        case fields.length
+        when 0
+          {}
+        when 1
+          { pointer_type: fields[0].prototype }
+        else
+          raise ArgumentError, "pointer may only contain its offset storage type"
         end
       end
 
@@ -403,6 +416,7 @@ module BinData
           buffer:     BinData::Buffer,
           choice:     BinData::Choice,
           delayed_io: BinData::DelayedIO,
+          pointer:    BinData::Pointer,
           section:    BinData::Section,
           skip:       BinData::Skip,
           struct:     BinData::Struct
@@ -416,7 +430,11 @@ module BinData
           parser.search_prefix(*@hints[:search_prefix])
           parser.instance_eval(&block)
 
-          parser.dsl_params
+          params = parser.dsl_params
+          if @type == :pointer
+            params[:pointer_type] = params.delete(:type)
+          end
+          params
         else
           {}
         end
