@@ -1,5 +1,13 @@
 = BinData Changelog
 
+== Unreleased
+
+* Added Decimal128Le and Decimal128Be: IEEE 754 decimal128 floating point
+  with DPD encoding.  Values keep their sign, decimal coefficient and
+  exponent (1.20 is not 1.2), support NaN payloads and infinities, and are
+  encoded without converting through Float.  Rounding mode is caller
+  selectable and encoding reports status flags (inexact, overflow, ...).
+
 == Version 3.0.1 (2026-09-27)
 
 * Fixed regression with anon classes. Thanks to Babar Al-Amin.
