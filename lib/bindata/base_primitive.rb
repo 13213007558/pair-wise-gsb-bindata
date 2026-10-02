@@ -74,6 +74,7 @@ module BinData
 
       raw_val = val.respond_to?(:snapshot) ? val.snapshot : val
       @value = raw_val.dup
+      parent&.child_written(self)
     end
 
     def snapshot

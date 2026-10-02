@@ -148,6 +148,7 @@ module BinData
           array:      [:to_object_params, :type,        [:multiple_fields, :optional_fieldnames]],
           buffer:     [:to_object_params, :type,        [:multiple_fields, :optional_fieldnames, :hidden_fields]],
           choice:     [:to_choice_params, :choices,     [:multiple_fields, :all_or_none_fieldnames, :fieldnames_are_values]],
+          union:      [:to_struct_params, :struct,      [:multiple_fields, :optional_fieldnames, :hidden_fields]],
           delayed_io: [:to_object_params, :type,        [:multiple_fields, :optional_fieldnames, :hidden_fields]],
           primitive:  [:to_struct_params, :struct,      [:multiple_fields, :optional_fieldnames]],
           section:    [:to_object_params, :type,        [:multiple_fields, :optional_fieldnames]],
@@ -405,7 +406,8 @@ module BinData
           delayed_io: BinData::DelayedIO,
           section:    BinData::Section,
           skip:       BinData::Skip,
-          struct:     BinData::Struct
+          struct:     BinData::Struct,
+          union:      BinData::Union
         }
 
         if bindata_classes.include?(@type)

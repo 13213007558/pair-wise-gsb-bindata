@@ -145,6 +145,7 @@ module BinData
     # Resets the internal state to that of a newly created object.
     def clear
       initialize_instance
+      parent&.child_written(self)
     end
 
     # Reads data into this data object.

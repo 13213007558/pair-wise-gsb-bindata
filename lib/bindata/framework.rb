@@ -50,6 +50,10 @@ module BinData
       false
     end
 
+    def child_written(child) # :nodoc:
+      parent&.child_written(self)
+    end
+
     # Reads the data for this data object from +io+.
     def do_read(io) # :nodoc:
       raise NotImplementedError
