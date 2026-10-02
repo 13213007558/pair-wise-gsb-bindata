@@ -74,7 +74,9 @@ module BinData
          %w[type initial_length read_until] +
          %w[fields endian search_namespace search_prefix hide onlyif byte_align] +
          %w[choices selection copy_on_change] +
-         %w[read_abs_offset struct_params])
+         %w[read_abs_offset struct_params offset_base relative
+            target_align align alignment target_type
+            offset_type offset_size offset_width null_value])
         .collect(&:to_sym)
         .uniq.collect { |key| [key, true] }
         .flatten
@@ -138,8 +140,11 @@ module BinData
     end
 
     def do_read(io) # :nodoc:
+      register_pointer_identity(io)
       instantiate_all_objs
-      @field_objs.each { |f| f.do_read(io) if include_obj_for_io?(f) }
+      @field_objs.each_with_index do |f, index|
+        read_field_with_pointer_identity(f, index, io)
+      end
     end
 
     def do_write(io) # :nodoc:
@@ -184,6 +189,28 @@ module BinData
 
     #---------------
     private
+
+    def register_pointer_identity(io)
+      registry = top_level_get(:pointer_objects)
+      return unless registry
+
+      self.layout_abs_offset = io.offset
+      key = [abs_offset, self.class]
+      registry[key] = self unless registry.key?(key)
+    end
+
+    def read_field_with_pointer_identity(field, index, io)
+      return unless include_obj_for_io?(field)
+
+      offset = io.offset
+      registry = top_level_get(:pointer_objects)
+      canonical = registry && registry[[offset, field.class]]
+      field.do_read(io)
+      if canonical && !canonical.equal?(field) &&
+         !equal?(canonical) && !ancestor?(canonical)
+        @field_objs[index] = canonical
+      end
+    end
 
     def define_field_accessors
       get_parameter(:fields).each_with_index do |field, i|
@@ -302,6 +329,7 @@ module BinData
     module ByteAlignPlugin
       def do_read(io)
         offset = 0
+        register_pointer_identity(io)
         instantiate_all_objs
         @field_objs.each do |f|
           next unless include_obj?(f)
@@ -312,7 +340,15 @@ module BinData
             io.readbytes(nbytes)
           end
 
+          field_offset = io.offset
           f.do_read(io)
+          registry = top_level_get(:pointer_objects)
+          canonical = registry && registry[[field_offset, f.class]]
+          if canonical && !canonical.equal?(f) &&
+             !equal?(canonical) && !ancestor?(canonical)
+            index = @field_objs.index(f)
+            @field_objs[index] = canonical
+          end
           nbytes = f.do_num_bytes
           offset = (nbytes.is_a?(Integer) ? offset.ceil : offset) + nbytes
         end

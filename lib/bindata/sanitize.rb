@@ -35,6 +35,14 @@ module BinData
       end
     end
 
+    def object_class
+      if defined? @factory
+        @factory.class
+      else
+        @obj_class
+      end
+    end
+
     def instantiate(value = nil, parent = nil)
       @factory ||= @obj_class.new(@obj_params)
 

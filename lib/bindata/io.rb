@@ -69,6 +69,11 @@ module BinData
         @io.num_bytes_remaining
       end
 
+      # The current offset within the io stream.
+      def offset
+        @io.offset
+      end
+
       # Seek +n+ bytes from the current position in the io stream.
       def skipbytes(n)
         reset_read_bits

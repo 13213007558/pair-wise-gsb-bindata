@@ -264,6 +264,29 @@ module BinData
       @element_prototype.instantiate(nil, self)
     end
 
+    def register_pointer_identity(io, offset = io.offset)
+      registry = top_level_get(:pointer_objects)
+      return unless registry
+      return if elements.empty?
+
+      key = [offset, self.class]
+      registry[key] = self unless registry.key?(key)
+    end
+
+    def read_element_with_pointer_identity(element, io)
+      offset = io.offset
+      registry = top_level_get(:pointer_objects)
+      canonical = registry && registry[[offset, element.class]]
+      canonical = nil if canonical && (equal?(canonical) || ancestor?(canonical))
+      self_key = [offset, self.class]
+      registered_self = registry && registry.delete(self_key)&.equal?(self)
+      element.do_read(io)
+      if canonical && !canonical.equal?(element)
+        elements[elements.index(element)] = canonical
+      end
+      registry[self_key] = self if registered_self
+    end
+
     def sum_num_bytes_for_all_elements
       sum_num_bytes_below_index(length)
     end
@@ -283,9 +306,10 @@ module BinData
     # Logic for the :read_until parameter
     module ReadUntilPlugin
       def do_read(io)
+        register_pointer_identity(io)
         loop do
           element = append_new_element
-          element.do_read(io)
+          read_element_with_pointer_identity(element, io)
           variables = { index: self.length - 1, element: self.last, array: self }
           break if eval_parameter(:read_until, variables)
         end
@@ -295,10 +319,11 @@ module BinData
     # Logic for the read_until: :eof parameter
     module ReadUntilEOFPlugin
       def do_read(io)
+        register_pointer_identity(io)
         loop do
           element = append_new_element
           begin
-            element.do_read(io)
+            read_element_with_pointer_identity(element, io)
           rescue EOFError, IOError
             elements.pop
             break
@@ -310,7 +335,8 @@ module BinData
     # Logic for the :initial_length parameter
     module InitialLengthPlugin
       def do_read(io)
-        elements.each { |el| el.do_read(io) }
+        register_pointer_identity(io)
+        elements.each { |el| read_element_with_pointer_identity(el, io) }
       end
 
       def elements

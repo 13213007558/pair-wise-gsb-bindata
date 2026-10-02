@@ -95,6 +95,9 @@ module BinData
     attr_accessor :parent
     protected :parent=
 
+    # The absolute offset assigned when this object is emitted by a Layout.
+    attr_accessor :layout_abs_offset
+
     # Creates a new data object based on this instance.
     #
     # This implements the prototype design pattern.
@@ -153,6 +156,7 @@ module BinData
 
       start_read do
         clear
+        top_level_set(:pointer_objects, {})
         do_read(io)
       end
       block.call(self) if block_given?
@@ -217,7 +221,18 @@ module BinData
     # Returns the offset (in bytes) of this object with respect to its most
     # distant ancestor.
     def abs_offset
+      return layout_abs_offset unless layout_abs_offset.nil?
       @parent ? @parent.abs_offset + @parent.offset_of(self) : 0
+    end
+
+    # Writes this object and all targets referenced by pointer fields.
+    def write_layout(io = nil)
+      BinData::Layout.write(self, io)
+    end
+
+    # Returns the binary string written by a Layout.
+    def to_layout_binary_s
+      write_layout
     end
 
     # Returns the offset (in bytes) of this object with respect to its parent.
@@ -280,6 +295,15 @@ module BinData
 
     def binary_string(str)
       str.to_s.dup.force_encoding(Encoding::BINARY)
+    end
+
+    def ancestor?(object)
+      ancestor = parent
+      while ancestor
+        return true if ancestor.equal?(object)
+        ancestor = ancestor.parent
+      end
+      false
     end
   end
 
