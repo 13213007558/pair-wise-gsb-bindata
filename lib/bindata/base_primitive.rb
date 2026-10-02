@@ -49,11 +49,13 @@ module BinData
   class BasePrimitive < BinData::Base
     unregister_self
 
-    optional_parameters :initial_value, :value, :assert, :asserted_value
+    optional_parameters :initial_value, :value, :assert, :asserted_value, :checksum
     mutually_exclusive_parameters :initial_value, :value
     mutually_exclusive_parameters :asserted_value, :value, :assert
+    mutually_exclusive_parameters :checksum, :value, :asserted_value
 
     def initialize_shared_instance
+      extend ChecksumFieldPlugin if has_parameter?(:checksum)
       extend InitialValuePlugin  if has_parameter?(:initial_value)
       extend ValuePlugin         if has_parameter?(:value)
       extend AssertPlugin        if has_parameter?(:assert)

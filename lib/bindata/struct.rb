@@ -84,6 +84,7 @@ module BinData
       fields = get_parameter(:fields)
       @field_names = fields.field_names.freeze
       extend ByteAlignPlugin if fields.any_field_has_parameter?(:byte_align)
+      extend ChecksumPlugin if fields.any_field_has_parameter?(:checksum)
       define_field_accessors
       super
     end
@@ -211,6 +212,10 @@ module BinData
       @field_objs.index { |el| el.equal?(obj) }
     end
 
+    def field_name_for(obj)
+      @field_names[find_index_of(obj)]
+    end
+
     def find_obj_for_name(name)
       index = @field_names.index(base_field_name(name))
       if index
@@ -281,6 +286,34 @@ module BinData
 
     def include_obj?(obj)
       !obj.has_parameter?(:onlyif) || obj.eval_parameter(:onlyif)
+    end
+
+    def checksum_rules
+      Checksum.rules_for(self, @field_objs)
+    end
+
+    def prepare_checksums
+      Checksum.ordered_rules(checksum_rules).each do |rule|
+        binary = Checksum.preview(self, rule.field, rule.filler_binary) do
+          to_binary_s
+        end
+        rule.assign_value(rule.compute(binary))
+      end
+    end
+
+    module ChecksumPlugin
+      def do_read(io) # :nodoc:
+        recording = Checksum::RecordingIO.new
+        io.transform(recording) do |transformed_io|
+          super(transformed_io)
+        end
+        checksum_rules.each { |rule| rule.verify(recording) }
+      end
+
+      def do_write(io) # :nodoc:
+        prepare_checksums unless Checksum.previewing?(self)
+        super(io)
+      end
     end
 
     # A hash that can be accessed via attributes.

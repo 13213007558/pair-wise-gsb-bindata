@@ -1,4 +1,5 @@
 require 'bindata/framework'
+require 'bindata/checksum'
 require 'bindata/io'
 require 'bindata/lazy'
 require 'bindata/name'
