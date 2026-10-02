@@ -35,6 +35,22 @@ module BinData
       end
     end
 
+    def get_parameter(param)
+      if defined? @factory
+        @factory.get_parameter(param)
+      else
+        @obj_params[param]
+      end
+    end
+
+    def obj_class
+      if defined? @factory
+        @factory.class
+      else
+        @obj_class
+      end
+    end
+
     def instantiate(value = nil, parent = nil)
       @factory ||= @obj_class.new(@obj_params)
 
@@ -57,6 +73,14 @@ module BinData
 
     def has_parameter?(param)
       @prototype.has_parameter?(param)
+    end
+
+    def get_parameter(param)
+      @prototype.get_parameter(param)
+    end
+
+    def obj_class
+      @prototype.obj_class
     end
 
     def instantiate(value = nil, parent = nil)
