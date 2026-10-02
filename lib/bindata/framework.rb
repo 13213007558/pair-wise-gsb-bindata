@@ -50,6 +50,12 @@ module BinData
       false
     end
 
+    # Called by a child after it has been modified.  Container types can
+    # override this to propagate or persist the change.
+    def child_updated(_child) # :nodoc:
+    end
+    protected :child_updated
+
     # Reads the data for this data object from +io+.
     def do_read(io) # :nodoc:
       raise NotImplementedError

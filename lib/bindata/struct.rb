@@ -283,6 +283,11 @@ module BinData
       !obj.has_parameter?(:onlyif) || obj.eval_parameter(:onlyif)
     end
 
+    def child_updated(_child) # :nodoc:
+      @parent&.__send__(:child_updated, self)
+    end
+    protected :child_updated
+
     # A hash that can be accessed via attributes.
     class Snapshot < ::Hash # :nodoc:
       def []=(key, value)

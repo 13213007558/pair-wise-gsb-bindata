@@ -280,6 +280,11 @@ module BinData
       end
     end
 
+    def child_updated(_child) # :nodoc:
+      @parent&.__send__(:child_updated, self)
+    end
+    protected :child_updated
+
     # Logic for the :read_until parameter
     module ReadUntilPlugin
       def do_read(io)
