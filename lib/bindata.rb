@@ -4,6 +4,7 @@
 require 'bindata/version'
 require 'bindata/array'
 require 'bindata/bits'
+require 'bindata/block_int_array'
 require 'bindata/buffer'
 require 'bindata/choice'
 require 'bindata/count_bytes_remaining'
