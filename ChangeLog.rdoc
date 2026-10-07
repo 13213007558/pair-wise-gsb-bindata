@@ -1,5 +1,10 @@
 = BinData Changelog
 
+== Unreleased
+
+* Added BinData::EliasFano, an Elias-Fano encoded non-decreasing integer
+  sequence supporting select, lower_bound and rank queries.
+
 == Version 3.0.1 (2026-09-27)
 
 * Fixed regression with anon classes. Thanks to Babar Al-Amin.
