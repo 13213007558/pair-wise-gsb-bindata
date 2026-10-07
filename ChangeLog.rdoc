@@ -1,5 +1,9 @@
 = BinData Changelog
 
+== Unreleased
+
+* Added rANS transform with single state and interleaved multi state layouts.
+
 == Version 3.0.1 (2026-09-27)
 
 * Fixed regression with anon classes. Thanks to Babar Al-Amin.
